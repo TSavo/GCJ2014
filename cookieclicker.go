@@ -40,65 +40,44 @@ func writeLines(lines []string, path string) error {
 	return w.Flush()
 }
 
-type Cards [][]int
-
-func MakeCards(cards []string) *Cards {
-	deck := make(Cards, 4)
-	for x := 0; x < 4; x++ {
-		deck[x] = make([]int, 4)
-	}
-	for rowNum, row := range cards {
-		for x, card := range strings.Split(row, " ") {
-			deck[rowNum][x], _ = strconv.Atoi(card)
+func CookieClick(C, F, X float64) float64 {
+	rate := 2.0
+	total_time := 0.0
+	if X <= C {
+		total_time = X / rate
+	} else {
+		for {
+			if (X / rate) < ((C / rate) + (X / (rate + F))) {
+				total_time += X / rate
+				break
+			} else {
+				total_time += C / rate
+				rate += F
+			}
 		}
 	}
-	return &deck
+	return total_time
 }
 
 func main() {
-
-	cases, _ := readLines("A-small-attempt0.in")
+	cases, _ := readLines("B-large.in")
 	numCases, _ := strconv.Atoi(cases[0])
 	cases = cases[1:len(cases)]
-	testCases := make([][]string, 0)
+	testCases := make([]string, 0)
 	fmt.Println(cases)
 	for x := 0; x < numCases; x++ {
-		testCases = append(testCases, cases[x*10:(x*10)+10])
+		testCases = append(testCases, cases[x])
 	}
 	fmt.Println(testCases)
 	resultList := make([]string, 0)
-	for caseNum, hand := range testCases {
-		firstGuess, _ := strconv.Atoi(hand[0])
-		secondGuess, _ := strconv.Atoi(hand[5])
-		deck1 := MakeCards(hand[1:5])
-		deck2 := MakeCards(hand[6:10])
-		found := false
-		badMagician := false
-		magic := 0
-		for _, first := range (*deck1)[firstGuess-1] {
-			for _, second := range (*deck2)[secondGuess-1] {
-				if first == second {
-					fmt.Println(first)
-					if found {
-						badMagician = true
-					} else {
-						magic = first
-						found = true
-					}
-				}
-			}
-		}
-		result := "Case #" + strconv.Itoa(caseNum +1) + ": "
-		if badMagician {
-			result += "Bad magician!"
-		} else if found {
-			result += strconv.Itoa(magic)
-		} else {
-			result += "Volunteer cheated!"
-		}
-		fmt.Println(firstGuess, secondGuess, deck1, deck2)
+	for caseNum, testCase := range testCases {
+		params := strings.Split(testCase, " ")
+		C, _ := strconv.ParseFloat(params[0], 32)
+		F, _ := strconv.ParseFloat(params[1], 32)
+		X, _ := strconv.ParseFloat(params[2], 32)
+		result := fmt.Sprintf("Case #"+strconv.Itoa(caseNum+1)+": %.7f", CookieClick(C, F, X))
 		fmt.Println(result)
 		resultList = append(resultList, result)
 	}
-	writeLines(resultList, "out.txt")
+	writeLines(resultList, "cookieout.txt")
 }
